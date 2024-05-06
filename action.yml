@@ -1,0 +1,49 @@
+name: "Generate COGS using Cofactr"
+description: >
+  Generate cost of goods sold (COGS) using Cofactr.
+inputs:
+  bom_file:
+    description: "Path to the BOM CSV file"
+    required: true
+  quantities:
+    description: >
+      A comma-separated list of quantities of PCBs to compute the COGS for. E.g.
+      1,10,100,1000. Defaults to the example.
+    default: "1,10,100,1000"
+  bom_part_number_column:
+    description: >
+      The name of the part number column in the BOM file. Defaults to 'Part
+      Number'.
+    default: Part Number
+  bom_quantity_column:
+    description: >
+      The name of the quantity column in the BOM file. Defaults to 'Quantity'.
+    default: Quantity
+  output_file:
+    description: >
+      The path to the output file. Defaults to stdout, i.e. printing to the
+      console.
+    default: ''
+  api_key:
+    description: "Cofactr API Key"
+    required: true
+  client_id:
+    description: "Cofactr Client ID"
+    required: true
+runs:
+  using: "docker"
+  image: "Dockerfile"
+  args:
+    - "--quantities"
+    - "${{ inputs.quantities }}"
+    - "--bom-part-number-column"
+    - ${{ inputs.bom_part_number_column }}
+    - "--bom-quantity-column"
+    - ${{ inputs.bom_quantity_column }}
+    - "--output-file"
+    - ${{ inputs.output_file }}
+    - ${{ inputs.bom_file }}
+  env:
+    ALLSPICE_AUTH_TOKEN: ${{ github.token }}
+    COFACTR_API_KEY: ${{ inputs.api_key }}
+    COFACTR_CLIENT_ID: ${{ inputs.client_id }}
