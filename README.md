@@ -12,7 +12,7 @@ Add the following step to your actions:
   with:
     bom_file: bom.csv
     quantities: "1,10,100,1000"
-    api_key: YOUR_COFACTR_API_KEY
     client_id: YOUR_COFACTR_CLIENT_ID
+    api_key: ${{ secrets.COFACTR_API_KEY }}
     output_file: cogs.csv
 ```
