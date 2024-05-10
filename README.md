@@ -8,7 +8,7 @@ Add the following step to your actions:
 
 ```yaml
 - name: Generate COGS using Cofactr
-  uses: https://hub.allspice.io/Actions/cofactr-cogs@main
+  uses: https://hub.allspice.io/Actions/cofactr-cogs@v1
   with:
     bom_file: bom.csv
     quantities: "1,10,100,1000"
