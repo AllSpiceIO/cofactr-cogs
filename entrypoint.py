@@ -11,10 +11,13 @@ from contextlib import ExitStack
 import csv
 import os
 import sys
+
 import requests
 
 
-def fetch_price_for_part(part_number: str, search_strategy: str) -> dict[int, float]:
+def fetch_price_for_part(
+    part_number: str, manufacturer: str, search_strategy: str
+) -> dict[int, float]:
     """
     Get the price of a component per n units.
 
@@ -53,6 +56,10 @@ def fetch_price_for_part(part_number: str, search_strategy: str) -> dict[int, fl
             "Please set the COFACTR_API_KEY and COFACTR_CLIENT_ID environment variables"
         )
 
+    query = part_number
+    if manufacturer:
+        query += f" {manufacturer}"
+
     search_response = requests.get(
         "https://graph.cofactr.com/products/",
         headers={
@@ -60,7 +67,7 @@ def fetch_price_for_part(part_number: str, search_strategy: str) -> dict[int, fl
             "X-CLIENT-ID": client_id,
         },
         params={
-            "q": part_number,
+            "q": query,
             "search_strategy": search_strategy,
             "schema": "product-offers-v0",
             "external": "true",
@@ -111,6 +118,11 @@ if __name__ == "__main__":
         default="Part Number",
     )
     parser.add_argument(
+        "--bom-manufacturer-column",
+        help="The name of the manufacturer column in the BOM file. Defaults to '%(default)s'.",
+        default="Manufacturer",
+    )
+    parser.add_argument(
         "--bom-quantity-column",
         help="The name of the quantity column in the BOM file. Defaults to '%(default)s'.",
         default="Quantity",
@@ -131,6 +143,7 @@ if __name__ == "__main__":
     quantities = [int(quantity) for quantity in args.quantities.split(",")]
 
     part_number_column = args.bom_part_number_column
+    manufacturer_column = args.bom_manufacturer_column
     quantity_column = args.bom_quantity_column
 
     with open(args.bom_file, "r") as bom_file:
@@ -147,7 +160,8 @@ if __name__ == "__main__":
 
     for part in parts:
         part_number = part[part_number_column]
-        prices = fetch_price_for_part(part_number, args.search_strategy)
+        manufacturer = part[manufacturer_column]
+        prices = fetch_price_for_part(part_number, manufacturer, args.search_strategy)
         if prices and len(prices) > 0:
             prices_for_parts[part_number] = prices
 

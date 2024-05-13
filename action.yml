@@ -15,6 +15,10 @@ inputs:
       The name of the part number column in the BOM file. Defaults to 'Part
       Number'.
     default: Part Number
+  bom_manufacturer_column:
+    description: >
+      The name of the manufacturer column in the BOM file. Defaults to 'Manufacturer'.
+    default: Manufacturer
   bom_quantity_column:
     description: >
       The name of the quantity column in the BOM file. Defaults to 'Quantity'.
@@ -43,6 +47,8 @@ runs:
     - "${{ inputs.quantities }}"
     - "--bom-part-number-column"
     - ${{ inputs.bom_part_number_column }}
+    - "--bom-manufacturer-column"
+    - ${{ inputs.bom_manufacturer_column }}
     - "--bom-quantity-column"
     - ${{ inputs.bom_quantity_column }}
     - "--search-strategy"
