@@ -26,8 +26,8 @@ inputs:
   search_strategy:
     description: >
       The Cofactr search strategy. Can be: default, mpn_sku_mfr, mpn_exact, mpn_exact_mfr. Defaults
-      to 'default'.
-    default: default
+      to 'mpn_sku_mfr'.
+    default: mpn_sku_mfr
   output_file:
     description: >
       The path to the output file. Defaults to stdout, i.e. printing to the

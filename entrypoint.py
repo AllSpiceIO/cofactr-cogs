@@ -131,7 +131,7 @@ if __name__ == "__main__":
         "--search-strategy",
         help="The Cofactr search strategy. Can be: default, mpn_sku_mfr, mpn_exact, mpn_exact_mfr. "
         + "Defaults to '%(default)s'.",
-        default="default",
+        default="mpn_sku_mfr",
     )
     parser.add_argument(
         "--output-file",
