@@ -14,7 +14,7 @@ import sys
 import requests
 
 
-def fetch_price_for_part(part_number: str) -> dict[int, float]:
+def fetch_price_for_part(part_number: str, search_strategy: str) -> dict[int, float]:
     """
     Get the price of a component per n units.
 
@@ -61,6 +61,7 @@ def fetch_price_for_part(part_number: str) -> dict[int, float]:
         },
         params={
             "q": part_number,
+            "search_strategy": search_strategy,
             "schema": "product-offers-v0",
             "external": "true",
             "limit": "1",
@@ -115,6 +116,12 @@ if __name__ == "__main__":
         default="Quantity",
     )
     parser.add_argument(
+        "--search-strategy",
+        help="The Cofactr search strategy. Can be: default, mpn_sku_mfr, mpn_exact, mpn_exact_mfr. "
+        + "Defaults to '%(default)s'.",
+        default="default",
+    )
+    parser.add_argument(
         "--output-file",
         help="The path to the output file. Defaults to stdout, i.e. printing to the console.",
     )
@@ -140,7 +147,7 @@ if __name__ == "__main__":
 
     for part in parts:
         part_number = part[part_number_column]
-        prices = fetch_price_for_part(part_number)
+        prices = fetch_price_for_part(part_number, args.search_strategy)
         if prices and len(prices) > 0:
             prices_for_parts[part_number] = prices
 
