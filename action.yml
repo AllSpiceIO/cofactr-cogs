@@ -13,7 +13,9 @@ inputs:
   bom_part_number_column:
     description: >
       The name of the part number column in the BOM file. Defaults to 'Part
-      Number'.
+      Number'. If this is a comma-separated list of part number column names,
+      each part number's prices will be fetched from the API in order, and the
+      first one found will be used.
     default: Part Number
   bom_quantity_column:
     description: >

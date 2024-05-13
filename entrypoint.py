@@ -122,14 +122,25 @@ if __name__ == "__main__":
 
     quantities = [int(quantity) for quantity in args.quantities.split(",")]
 
-    part_number_column = args.bom_part_number_column
+    part_number_columns = (
+        args.bom_part_number_column.split(",") if args.bom_part_number_column else []
+    )
+    if not part_number_columns:
+        print("No part number columns given", file=sys.stderr)
+        sys.exit(1)
+
     quantity_column = args.bom_quantity_column
 
     with open(args.bom_file, "r") as bom_file:
         bom_csv = csv.DictReader(bom_file)
 
         parts = [
-            part for part in bom_csv if part[part_number_column] and part[part_number_column] != ""
+            part
+            for part in bom_csv
+            if any(
+                part[part_number_column] and part[part_number_column] != ""
+                for part_number_column in part_number_columns
+            )
         ]
 
     print(f"Computing COGS for {len(parts)} parts", file=sys.stderr)
@@ -138,10 +149,16 @@ if __name__ == "__main__":
     prices_for_parts = {}
 
     for part in parts:
-        part_number = part[part_number_column]
-        prices = fetch_price_for_part(part_number)
-        if prices and len(prices) > 0:
-            prices_for_parts[part_number] = prices
+        # Try each part number.
+        for part_number_column in part_number_columns:
+            part_number = part[part_number_column]
+            # Fetch this part number's prices from the API.
+            fetched_prices = fetch_price_for_part(part_number)
+            if fetched_prices and len(fetched_prices) > 0:
+                prices_for_parts[part_number] = fetched_prices
+                # A price was found for this part number.  We can stop trying
+                # other part numbers.
+                break
 
     print(f"Found prices for {len(prices_for_parts)} parts", file=sys.stderr)
 
@@ -162,27 +179,37 @@ if __name__ == "__main__":
     totals: dict[int, float] = {quantity: 0 for quantity in quantities}
 
     for part in parts:
-        part_number = part[part_number_column]
         part_quantity = int(part[quantity_column])
 
-        current_row = [part_number, part_quantity]
+        for part_number_column in part_number_columns:
+            part_number = part[part_number_column]
 
-        for quantity in quantities:
-            try:
-                prices = prices_for_parts[part_number]
-                largest_breakpoint_less_than_qty = max(
-                    [breakpoint for breakpoint in prices.keys() if breakpoint <= quantity]
-                )
-                price_at_breakpoint = prices[largest_breakpoint_less_than_qty]
-                current_row.append(price_at_breakpoint)
-                total_for_part_at_quantity = price_at_breakpoint * part_quantity
-                current_row.append(total_for_part_at_quantity)
-                totals[quantity] += total_for_part_at_quantity
-            except (ValueError, KeyError):
-                current_row.append(None)
-                current_row.append(None)
+            prices = prices_for_parts.get(part_number)
+            if prices is None:
+                # Prices not found.  Try the next part number.
+                continue
 
-        rows.append(current_row)
+            current_row = [part_number, part_quantity]
+
+            for quantity in quantities:
+                try:
+                    largest_breakpoint_less_than_qty = max(
+                        [breakpoint for breakpoint in prices.keys() if breakpoint <= quantity]
+                    )
+                    price_at_breakpoint = prices[largest_breakpoint_less_than_qty]
+                    current_row.append(price_at_breakpoint)
+                    total_for_part_at_quantity = price_at_breakpoint * part_quantity
+                    current_row.append(total_for_part_at_quantity)
+                    totals[quantity] += total_for_part_at_quantity
+                except (ValueError, KeyError):
+                    current_row.append(None)
+                    current_row.append(None)
+
+            rows.append(current_row)
+
+            # We created a row for this part number.  We can stop trying other
+            # part numbers.
+            break
 
     with ExitStack() as stack:
         if args.output_file:
