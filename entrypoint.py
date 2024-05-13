@@ -181,8 +181,13 @@ if __name__ == "__main__":
     for part in parts:
         part_quantity = int(part[quantity_column])
 
+        first_part_number = None
+        prices_found = False
         for part_number_column in part_number_columns:
             part_number = part[part_number_column]
+
+            if first_part_number is None:
+                first_part_number = part_number
 
             prices = prices_for_parts.get(part_number)
             if prices is None:
@@ -205,11 +210,20 @@ if __name__ == "__main__":
                     current_row.append(None)
                     current_row.append(None)
 
+            # We found prices for this part number.  We can stop trying other part numbers.
+            prices_found = True
             rows.append(current_row)
-
-            # We created a row for this part number.  We can stop trying other
-            # part numbers.
             break
+
+        if not prices_found:
+            # No prices found for any part number.  Add a row with the first part number and no
+            # prices.
+            assert first_part_number is not None
+            current_row = [first_part_number, part_quantity]
+            for quantity in quantities:
+                current_row.append(None)
+                current_row.append(None)
+            rows.append(current_row)
 
     with ExitStack() as stack:
         if args.output_file:
