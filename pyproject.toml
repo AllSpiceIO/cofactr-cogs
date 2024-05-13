@@ -1,0 +1,8 @@
+[tool.ruff]
+lint.ignore = [
+  "E501", # Line length.
+  "F405", # Unknown identifier usage due to import *.
+]
+line-length = 100
+lint.select = ["E", "F", "RUF"]
+exclude = []
