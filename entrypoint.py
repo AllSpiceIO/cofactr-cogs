@@ -58,12 +58,12 @@ def fetch_price_for_part(part_number: str) -> dict[int, float]:
             "X-API-KEY": api_key,
             "X-CLIENT-ID": client_id,
         },
-        params={
-            "q": part_number,
-            "schema": "product-offers-v0",
-            "external": True,
-            "limit": 1,
-        },
+        params=(
+            ("q", part_number),
+            ("schema", "product-offers-v0"),
+            ("external", True),
+            ("limit", 1),
+        ),
     )
 
     if search_response.status_code != 200:
@@ -149,8 +149,6 @@ if __name__ == "__main__":
         print("No prices found for any parts", file=sys.stderr)
         sys.exit(1)
 
-    cogs_for_quantities = {}
-
     headers = [
         "Part Number",
         "Quantity",
@@ -161,7 +159,7 @@ if __name__ == "__main__":
         headers.append(f"Total at {quantity}")
 
     rows = []
-    totals = {quantity: 0 for quantity in quantities}
+    totals: dict[int, float] = {quantity: 0 for quantity in quantities}
 
     for part in parts:
         part_number = part[part_number_column]
@@ -199,7 +197,7 @@ if __name__ == "__main__":
         totals_row = ["Totals", None]
         for quantity in quantities:
             totals_row.append(None)
-            totals_row.append(totals[quantity])
+            totals_row.append(str(totals[quantity]))
 
         writer.writerow(totals_row)
 
