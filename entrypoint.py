@@ -58,12 +58,12 @@ def fetch_price_for_part(part_number: str) -> dict[int, float]:
             "X-API-KEY": api_key,
             "X-CLIENT-ID": client_id,
         },
-        params=(
-            ("q", part_number),
-            ("schema", "product-offers-v0"),
-            ("external", True),
-            ("limit", 1),
-        ),
+        params={
+            "q": part_number,
+            "schema": "product-offers-v0",
+            "external": "true",
+            "limit": "1",
+        },
     )
 
     if search_response.status_code != 200:
