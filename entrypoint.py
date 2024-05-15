@@ -77,7 +77,7 @@ def fetch_price_for_part(
 
     if search_response.status_code != 200:
         print(
-            f"Warning: Received status code {search_response.status_code} for {part_number}",
+            f"Warning: Received status code {search_response.status_code} for {part_number} {manufacturer}",
             file=sys.stderr,
         )
         return {}
@@ -87,7 +87,7 @@ def fetch_price_for_part(
         reference_prices = search_results.get("data", [])[0].get("reference_prices")
     except IndexError:
         print(
-            f"Warning: No results found for {part_number}",
+            f"Warning: No results found for {part_number} {manufacturer}",
             file=sys.stderr,
         )
         return {}
@@ -173,6 +173,7 @@ if __name__ == "__main__":
 
     headers = [
         "Part Number",
+        "Manufacturer",
         "Quantity",
     ]
 
@@ -185,9 +186,10 @@ if __name__ == "__main__":
 
     for part in parts:
         part_number = part[part_number_column]
+        manufacturer = part[manufacturer_column]
         part_quantity = int(part[quantity_column])
 
-        current_row = [part_number, part_quantity]
+        current_row = [part_number, manufacturer, part_quantity]
 
         for quantity in quantities:
             try:
@@ -216,7 +218,7 @@ if __name__ == "__main__":
         writer.writerow(headers)
         writer.writerows(rows)
 
-        totals_row = ["Totals", None]
+        totals_row = ["Totals", None, None]
         for quantity in quantities:
             totals_row.append(None)
             totals_row.append(str(totals[quantity]))
