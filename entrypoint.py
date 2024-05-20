@@ -57,7 +57,7 @@ def fetch_price_for_part(
         )
 
     query = part_number
-    if search_strategy != "mpn_exact" and manufacturer:
+    if query_needs_manufacturer(search_strategy) and manufacturer:
         query += f" {manufacturer}"
 
     search_response = requests.get(
@@ -95,6 +95,10 @@ def fetch_price_for_part(
     prices = {int(price["quantity"]): float(price["price"]) for price in reference_prices}
 
     return prices
+
+
+def query_needs_manufacturer(search_strategy: str) -> bool:
+    return search_strategy != "mpn_exact"
 
 
 if __name__ == "__main__":
@@ -159,6 +163,10 @@ if __name__ == "__main__":
     prices_for_parts = {}
 
     use_mfr = bool(manufacturer_column)
+    if not use_mfr and query_needs_manufacturer(args.search_strategy):
+        raise ValueError(
+            "Search strategy requires manufacturer, but no BOM manufacturer column was provided"
+        )
 
     for part in parts:
         part_number = part[part_number_column]
