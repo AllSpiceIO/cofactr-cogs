@@ -57,7 +57,7 @@ def fetch_price_for_part(
         )
 
     query = part_number
-    if manufacturer:
+    if search_strategy != "mpn_exact" and manufacturer:
         query += f" {manufacturer}"
 
     search_response = requests.get(
