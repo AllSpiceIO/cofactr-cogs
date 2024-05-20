@@ -25,8 +25,9 @@ inputs:
     default: Quantity
   search_strategy:
     description: >
-      The Cofactr search strategy. Can be: default, mpn_sku_mfr, mpn_exact, mpn_exact_mfr. Defaults
-      to 'mpn_sku_mfr'.
+      The Cofactr search strategy. Can be: "default" (uses mpn), "mpn_sku_mfr",
+      "mpn_exact", "mpn_exact_mfr". Defaults to "mpn_sku_mfr".  See Cofactr API
+      documentation for more information on search strategies.
     default: mpn_sku_mfr
   output_file:
     description: >
