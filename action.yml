@@ -17,8 +17,9 @@ inputs:
     default: Part Number
   bom_manufacturer_column:
     description: >
-      The name of the manufacturer column in the BOM file. Defaults to 'Manufacturer'.
-    default: Manufacturer
+      The name of the manufacturer column in the BOM file.  Defaults to ''.  If
+      you use a search strategy that uses manufacturer, you must provide this.
+    default: ''
   bom_quantity_column:
     description: >
       The name of the quantity column in the BOM file. Defaults to 'Quantity'.

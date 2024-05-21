@@ -123,8 +123,9 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "--bom-manufacturer-column",
-        help="The name of the manufacturer column in the BOM file. Defaults to '%(default)s'.",
-        default="Manufacturer",
+        help="The name of the manufacturer column in the BOM file.  Defaults to '%(default)s'.  If "
+        + "you use a search strategy that uses manufacturer, you must provide this.",
+        default="",
     )
     parser.add_argument(
         "--bom-quantity-column",
