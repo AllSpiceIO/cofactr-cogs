@@ -12,9 +12,9 @@ inputs:
     default: "1,10,100,1000"
   bom_part_number_column:
     description: >
-      The name of the part number column in the BOM file. Defaults to 'Part
-      Number'.
-    default: Part Number
+      The name of the part number column in the BOM file.  You must provide
+      this.
+    default: ''
   bom_manufacturer_column:
     description: >
       The name of the manufacturer column in the BOM file.  Defaults to ''.  If
@@ -22,8 +22,8 @@ inputs:
     default: ''
   bom_quantity_column:
     description: >
-      The name of the quantity column in the BOM file. Defaults to 'Quantity'.
-    default: Quantity
+      The name of the quantity column in the BOM file.  You must provide this.
+    default: ''
   search_strategy:
     description: >
       The Cofactr search strategy. Can be: "mpn_sku_mfr" or "fuzzy" (uses mpn).

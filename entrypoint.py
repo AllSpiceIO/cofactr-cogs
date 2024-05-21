@@ -31,8 +31,8 @@ def main() -> None:
     )
     parser.add_argument(
         "--bom-part-number-column",
-        help="The name of the part number column in the BOM file. Defaults to '%(default)s'.",
-        default="Part Number",
+        help="The name of the part number column in the BOM file.  You must provide this.",
+        default="",
     )
     parser.add_argument(
         "--bom-manufacturer-column",
@@ -42,8 +42,8 @@ def main() -> None:
     )
     parser.add_argument(
         "--bom-quantity-column",
-        help="The name of the quantity column in the BOM file. Defaults to '%(default)s'.",
-        default="Quantity",
+        help="The name of the quantity column in the BOM file.  You must provide this.",
+        default="",
     )
     parser.add_argument(
         "--search-strategy",
@@ -67,8 +67,14 @@ def main() -> None:
     quantities = [int(quantity) for quantity in args.quantities.split(",")]
 
     part_number_column = args.bom_part_number_column
+    if not part_number_column:
+        raise ValueError("BOM part number column needs to be specified.")
+
     manufacturer_column = args.bom_manufacturer_column
     quantity_column = args.bom_quantity_column
+    if not quantity_column:
+        raise ValueError("BOM quantity column needs to be specified.")
+
     search_strategy = SearchStrategy(args.search_strategy)
 
     with open(args.bom_file, "r") as bom_file:
