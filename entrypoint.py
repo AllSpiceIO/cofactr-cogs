@@ -153,6 +153,11 @@ def main() -> None:
         "--output-file",
         help="The path to the output file. Defaults to stdout, i.e. printing to the console.",
     )
+    parser.add_argument(
+        "--log-level",
+        help="The log level to use.  Defaults to '%(default)s'.",
+        default="info",
+    )
 
     args = parser.parse_args()
 
@@ -183,6 +188,13 @@ def main() -> None:
         raise ValueError(
             "Search strategy requires manufacturer, but no BOM manufacturer column was provided.  Please set bom_manufacturer_column."
         )
+
+    if args.log_level.lower() == "debug":
+        print(f"Using part number column: {part_number_column!r}", file=sys.stderr)
+        print(f"Using manufacturer column: {manufacturer_column!r}", file=sys.stderr)
+        print(f"Using use_mfr: {use_mfr!r}", file=sys.stderr)
+        print(f"Using quantity column: {quantity_column!r}", file=sys.stderr)
+        print(f"Using search strategy: {search_strategy!r}", file=sys.stderr)
 
     for part in parts:
         part_number = part[part_number_column]

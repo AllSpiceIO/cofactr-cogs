@@ -41,6 +41,9 @@ inputs:
   client_id:
     description: "Cofactr Client ID"
     required: true
+  log_level:
+    description: Set log level for debugging
+    default: info
 runs:
   using: "docker"
   image: "Dockerfile"
@@ -57,6 +60,8 @@ runs:
     - ${{ inputs.search_strategy }}
     - "--output-file"
     - ${{ inputs.output_file }}
+    - "--log-level"
+    - ${{ inputs.log_level }}
     - ${{ inputs.bom_file }}
   env:
     ALLSPICE_AUTH_TOKEN: ${{ github.token }}
