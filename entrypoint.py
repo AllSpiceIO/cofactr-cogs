@@ -234,14 +234,9 @@ def main() -> None:
         current_row = [part_number, manufacturer, cofactr_id, part_quantity]
 
         for quantity in quantities:
-            if part_prices is not None:
-                largest_breakpoint_less_than_qty = max(
-                    [
-                        breakpoint
-                        for breakpoint in part_prices.prices.keys()
-                        if breakpoint <= quantity
-                    ]
-                )
+            breakpoints = price_breakpoints(part_prices, quantity)
+            if part_prices and breakpoints:
+                largest_breakpoint_less_than_qty = max(breakpoints)
                 price_at_breakpoint = part_prices.prices[largest_breakpoint_less_than_qty]
                 current_row.append(price_at_breakpoint)
                 total_for_part_at_quantity = price_at_breakpoint * part_quantity
@@ -271,6 +266,13 @@ def main() -> None:
         writer.writerow(totals_row)
 
     print("Computed COGS", file=sys.stderr)
+
+
+def price_breakpoints(part_prices: PartPrices | None, quantity: int) -> list[int] | None:
+    if part_prices is None:
+        return None
+    breakpoints = [breakpoint for breakpoint in part_prices.prices.keys() if breakpoint <= quantity]
+    return breakpoints if len(breakpoints) > 0 else None
 
 
 if __name__ == "__main__":
