@@ -9,15 +9,22 @@
 from argparse import ArgumentParser
 from contextlib import ExitStack
 import csv
+from dataclasses import dataclass
 import os
 import sys
 
 import requests
 
 
+@dataclass
+class PartPrices:
+    cofactr_id: str
+    prices: dict[int, float]
+
+
 def fetch_price_for_part(
     part_number: str, manufacturer: str, search_strategy: str
-) -> dict[int, float]:
+) -> PartPrices | None:
     """
     Get the price of a component per n units.
 
@@ -47,7 +54,7 @@ def fetch_price_for_part(
     """
 
     if part_number.startswith("NOTAPART"):
-        return {}
+        return None
 
     api_key = os.environ.get("COFACTR_API_KEY")
     client_id = os.environ.get("COFACTR_CLIENT_ID")
@@ -80,7 +87,7 @@ def fetch_price_for_part(
             f"Warning: Received status code {search_response.status_code} for {part_number} {manufacturer}",
             file=sys.stderr,
         )
-        return {}
+        return None
 
     search_results = search_response.json()
     try:
@@ -90,11 +97,14 @@ def fetch_price_for_part(
             f"Warning: No results found for {part_number} {manufacturer}",
             file=sys.stderr,
         )
-        return {}
+        return None
 
     prices = {int(price["quantity"]): float(price["price"]) for price in reference_prices}
 
-    return prices
+    return PartPrices(
+        cofactr_id=search_results["data"][0]["id"],
+        prices=prices,
+    )
 
 
 def query_needs_manufacturer(search_strategy: str) -> bool:
@@ -177,9 +187,9 @@ def main() -> None:
     for part in parts:
         part_number = part[part_number_column]
         manufacturer = part[manufacturer_column] if use_mfr else ""
-        prices = fetch_price_for_part(part_number, manufacturer, search_strategy)
-        if prices and len(prices) > 0:
-            prices_for_parts[part_number] = prices
+        part_prices = fetch_price_for_part(part_number, manufacturer, search_strategy)
+        if part_prices is not None:
+            prices_for_parts[(part_number, manufacturer)] = part_prices
 
     print(f"Found prices for {len(prices_for_parts)} parts", file=sys.stderr)
 
@@ -190,6 +200,7 @@ def main() -> None:
     headers = [
         "Part Number",
         "Manufacturer",
+        "Cofactr ID",
         "Quantity",
     ]
 
@@ -205,20 +216,26 @@ def main() -> None:
         manufacturer = part[manufacturer_column] if use_mfr else ""
         part_quantity = int(part[quantity_column])
 
-        current_row = [part_number, manufacturer, part_quantity]
+        part_prices = prices_for_parts.get((part_number, manufacturer))
+        cofactr_id = part_prices.cofactr_id if part_prices else None
+
+        current_row = [part_number, manufacturer, cofactr_id, part_quantity]
 
         for quantity in quantities:
-            try:
-                prices = prices_for_parts[part_number]
+            if part_prices is not None:
                 largest_breakpoint_less_than_qty = max(
-                    [breakpoint for breakpoint in prices.keys() if breakpoint <= quantity]
+                    [
+                        breakpoint
+                        for breakpoint in part_prices.prices.keys()
+                        if breakpoint <= quantity
+                    ]
                 )
-                price_at_breakpoint = prices[largest_breakpoint_less_than_qty]
+                price_at_breakpoint = part_prices.prices[largest_breakpoint_less_than_qty]
                 current_row.append(price_at_breakpoint)
                 total_for_part_at_quantity = price_at_breakpoint * part_quantity
                 current_row.append(total_for_part_at_quantity)
                 totals[quantity] += total_for_part_at_quantity
-            except (ValueError, KeyError):
+            else:
                 current_row.append(None)
                 current_row.append(None)
 
@@ -234,7 +251,7 @@ def main() -> None:
         writer.writerow(headers)
         writer.writerows(rows)
 
-        totals_row = ["Totals", None, None]
+        totals_row = ["Totals", None, None, None]
         for quantity in quantities:
             totals_row.append(None)
             totals_row.append(str(totals[quantity]))
