@@ -68,12 +68,16 @@ def main() -> None:
 
     part_number_column = args.bom_part_number_column
     if not part_number_column:
-        raise ValueError("BOM part number column needs to be specified.")
+        raise ValueError(
+            "BOM part number column needs to be specified.  Please set bom_part_number_column."
+        )
 
     manufacturer_column = args.bom_manufacturer_column
     quantity_column = args.bom_quantity_column
     if not quantity_column:
-        raise ValueError("BOM quantity column needs to be specified.")
+        raise ValueError(
+            "BOM quantity column needs to be specified.  Please set bom_quantity_column."
+        )
 
     search_strategy = SearchStrategy(args.search_strategy)
 
