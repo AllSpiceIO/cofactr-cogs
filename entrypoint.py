@@ -188,7 +188,7 @@ def main() -> None:
         part_number = part[part_number_column]
         manufacturer = part[manufacturer_column] if use_mfr else ""
         part_prices = fetch_price_for_part(part_number, manufacturer, search_strategy)
-        if part_prices is not None:
+        if part_prices is not None and len(part_prices.prices) > 0:
             prices_for_parts[(part_number, manufacturer)] = part_prices
 
     print(f"Found prices for {len(prices_for_parts)} parts", file=sys.stderr)
