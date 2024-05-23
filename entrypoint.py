@@ -1,9 +1,10 @@
 #! /usr/bin/env python3
 
-# Compute the Cost of Goods Sold for a PrjPcb file.
-# This example doesn't depend on py-allspice, but requires a BOM CSV file to
-# run. You can use the `generate_bom.py` script in this directory to generate
-# a BOM CSV.
+# Compute the Cost of Goods Sold for a BOM.
+#
+# This script doesn't depend on py-allspice, but it requires a BOM CSV file to
+# run. You can use https://github.com/AllSpiceIO/generate-bom to generate a BOM
+# CSV.
 
 from argparse import ArgumentParser
 from contextlib import ExitStack
