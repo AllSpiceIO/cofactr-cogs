@@ -101,7 +101,7 @@ def query_needs_manufacturer(search_strategy: str) -> bool:
     return search_strategy != "mpn_exact"
 
 
-if __name__ == "__main__":
+def main() -> None:
     parser = ArgumentParser()
 
     parser.add_argument(
@@ -242,3 +242,7 @@ if __name__ == "__main__":
         writer.writerow(totals_row)
 
     print("Computed COGS", file=sys.stderr)
+
+
+if __name__ == "__main__":
+    main()
