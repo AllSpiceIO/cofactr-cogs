@@ -15,6 +15,7 @@ Add the following step to your actions:
     bom_manufacturer_column: Manufacturer
     bom_quantity_column: Quantity
     quantities: "1,10,100,1000"
+    search_strategy: mpn_sku_mfr
     client_id: YOUR_COFACTR_CLIENT_ID
     api_key: ${{ secrets.COFACTR_API_KEY }}
     output_file: cogs.csv
