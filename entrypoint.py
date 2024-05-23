@@ -181,7 +181,7 @@ def main() -> None:
     use_mfr = bool(manufacturer_column)
     if not use_mfr and query_needs_manufacturer(search_strategy):
         raise ValueError(
-            "Search strategy requires manufacturer, but no BOM manufacturer column was provided"
+            "Search strategy requires manufacturer, but no BOM manufacturer column was provided.  Please set bom_manufacturer_column."
         )
 
     for part in parts:
