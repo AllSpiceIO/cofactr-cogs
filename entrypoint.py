@@ -134,7 +134,7 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "--search-strategy",
-        help="The Cofactr search strategy. Can be: default or mpn_sku_mfr. "
+        help="The Cofactr search strategy. Can be: mpn_sku_mfr or fuzzy (uses mpn). "
         + "Defaults to '%(default)s'.  The API also supports mpn_exact and mpn_exact_mfr, "
         + "but they are not recommended.",
         default="mpn_sku_mfr",
@@ -151,6 +151,10 @@ if __name__ == "__main__":
     part_number_column = args.bom_part_number_column
     manufacturer_column = args.bom_manufacturer_column
     quantity_column = args.bom_quantity_column
+    search_strategy = args.search_strategy
+    if search_strategy == "fuzzy":
+        # Cofactr's default search strategy is designed for search results.
+        search_strategy = "default"
 
     with open(args.bom_file, "r") as bom_file:
         bom_csv = csv.DictReader(bom_file)
@@ -165,7 +169,7 @@ if __name__ == "__main__":
     prices_for_parts = {}
 
     use_mfr = bool(manufacturer_column)
-    if not use_mfr and query_needs_manufacturer(args.search_strategy):
+    if not use_mfr and query_needs_manufacturer(search_strategy):
         raise ValueError(
             "Search strategy requires manufacturer, but no BOM manufacturer column was provided"
         )
@@ -173,7 +177,7 @@ if __name__ == "__main__":
     for part in parts:
         part_number = part[part_number_column]
         manufacturer = part[manufacturer_column] if use_mfr else ""
-        prices = fetch_price_for_part(part_number, manufacturer, args.search_strategy)
+        prices = fetch_price_for_part(part_number, manufacturer, search_strategy)
         if prices and len(prices) > 0:
             prices_for_parts[part_number] = prices
 

@@ -26,7 +26,7 @@ inputs:
     default: Quantity
   search_strategy:
     description: >
-      The Cofactr search strategy. Can be: "default" (uses mpn), "mpn_sku_mfr".
+      The Cofactr search strategy. Can be: "mpn_sku_mfr" or "fuzzy" (uses mpn).
       Defaults to "mpn_sku_mfr".  See Cofactr API documentation for more
       information on search strategies.
     default: mpn_sku_mfr
