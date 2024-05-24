@@ -109,16 +109,20 @@ def main() -> None:
         print("No prices found for any parts", file=sys.stderr)
         sys.exit(1)
 
-    headers = [
-        "Part Number",
-        "Manufacturer",
-        "Cofactr ID",
-        "Quantity",
-    ]
+    # The number of columns that the output should have.
+    expected_columns = (4 if use_mfr else 3) + 2 * len(quantities)
+
+    headers = ["Part Number"]
+    if use_mfr:
+        headers.append("Manufacturer")
+    headers.append("Cofactr ID")
+    headers.append("Quantity")
 
     for quantity in quantities:
         headers.append(f"Per Unit at {quantity}")
         headers.append(f"Total at {quantity}")
+
+    assert len(headers) == expected_columns
 
     rows = []
     totals: dict[int, float] = {quantity: 0 for quantity in quantities}
@@ -131,7 +135,11 @@ def main() -> None:
         part_prices = prices_for_parts.get((part_number, manufacturer))
         cofactr_id = part_prices.cofactr_id if part_prices else None
 
-        current_row = [part_number, manufacturer, cofactr_id, part_quantity]
+        current_row = [part_number]
+        if use_mfr:
+            current_row.append(manufacturer)
+        current_row.append(cofactr_id)
+        current_row.append(part_quantity)
 
         for quantity in quantities:
             breakpoints = price_breakpoints(part_prices, quantity)
@@ -146,6 +154,7 @@ def main() -> None:
                 current_row.append(None)
                 current_row.append(None)
 
+        assert len(current_row) == expected_columns
         rows.append(current_row)
 
     with ExitStack() as stack:
@@ -158,11 +167,14 @@ def main() -> None:
         writer.writerow(headers)
         writer.writerows(rows)
 
-        totals_row = ["Totals", None, None, None]
+        totals_row = ["Totals", None, None]
+        if use_mfr:
+            totals_row.append(None)
         for quantity in quantities:
             totals_row.append(None)
             totals_row.append(str(totals[quantity]))
 
+        assert len(totals_row) == expected_columns
         writer.writerow(totals_row)
 
     print("Computed COGS", file=sys.stderr)
