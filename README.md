@@ -1,6 +1,8 @@
 # Cofactr COGS
 
-Generate cost of goods sold (COGS) using Cofactr.
+Generate cost of goods sold (COGS) in AllSpice Actions using Cofactr.
+
+This uses the Cofactr API.  See the [Cofactr API docs](https://help.cofactr.com/en/articles/8868930-cofactr-component-cloud-api-documentation) for more information.
 
 ## Usage
 
