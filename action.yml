@@ -12,13 +12,24 @@ inputs:
     default: "1,10,100,1000"
   bom_part_number_column:
     description: >
-      The name of the part number column in the BOM file. Defaults to 'Part
-      Number'.
-    default: Part Number
+      The name of the part number column in the BOM file.  You must provide
+      this.
+    default: ''
+  bom_manufacturer_column:
+    description: >
+      The name of the manufacturer column in the BOM file.  Defaults to ''.  If
+      you use a search strategy that uses manufacturer, you must provide this.
+    default: ''
   bom_quantity_column:
     description: >
-      The name of the quantity column in the BOM file. Defaults to 'Quantity'.
-    default: Quantity
+      The name of the quantity column in the BOM file.  You must provide this.
+    default: ''
+  search_strategy:
+    description: >
+      The Cofactr search strategy. Can be: "mpn_sku_mfr" or "fuzzy" (uses mpn).
+      Defaults to "mpn_sku_mfr".  See Cofactr API documentation for more
+      information on search strategies.
+    default: mpn_sku_mfr
   output_file:
     description: >
       The path to the output file. Defaults to stdout, i.e. printing to the
@@ -30,6 +41,9 @@ inputs:
   client_id:
     description: "Cofactr Client ID"
     required: true
+  log_level:
+    description: Set log level for debugging
+    default: info
 runs:
   using: "docker"
   image: "Dockerfile"
@@ -38,10 +52,16 @@ runs:
     - "${{ inputs.quantities }}"
     - "--bom-part-number-column"
     - ${{ inputs.bom_part_number_column }}
+    - "--bom-manufacturer-column"
+    - ${{ inputs.bom_manufacturer_column }}
     - "--bom-quantity-column"
     - ${{ inputs.bom_quantity_column }}
+    - "--search-strategy"
+    - ${{ inputs.search_strategy }}
     - "--output-file"
     - ${{ inputs.output_file }}
+    - "--log-level"
+    - ${{ inputs.log_level }}
     - ${{ inputs.bom_file }}
   env:
     ALLSPICE_AUTH_TOKEN: ${{ github.token }}
