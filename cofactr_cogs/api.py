@@ -1,7 +1,7 @@
-from dataclasses import dataclass
-from enum import Enum
 import os
 import sys
+from dataclasses import dataclass
+from enum import Enum
 
 import requests
 

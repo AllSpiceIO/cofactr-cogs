@@ -3,12 +3,12 @@
 # This script doesn't depend on py-allspice, but it requires a BOM CSV file to
 # run. You can use https://github.com/AllSpiceIO/generate-bom to generate a BOM
 # CSV.
-from argparse import ArgumentParser
-from contextlib import ExitStack
 import csv
 import sys
+from argparse import ArgumentParser
+from contextlib import ExitStack
 
-from cofactr_cogs.api import fetch_price_for_part, PartPrices, SearchStrategy
+from cofactr_cogs.api import PartPrices, SearchStrategy, fetch_price_for_part
 
 
 def main() -> None:
