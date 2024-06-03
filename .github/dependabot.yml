@@ -4,6 +4,11 @@ updates:
     directory: /
     schedule:
       interval: monthly
+    groups:
+      requests-dependencies:
+        patterns:
+          - "types-requests"
+          - "requests"
   - package-ecosystem: github-actions
     directory: /
     schedule:
